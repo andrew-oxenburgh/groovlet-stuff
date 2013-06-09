@@ -1,3 +1,7 @@
 
+public void help(){
+    println 'One:\tjust print these args'
+}
 
-println 'one is the first'
+println "1 is the first=${args[0]}"
+
