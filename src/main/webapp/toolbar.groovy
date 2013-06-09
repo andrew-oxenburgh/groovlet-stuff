@@ -1,35 +1,29 @@
 import groovy.transform.Field
 
-@Grab(group='junit', module='junit', version='4.11')
-
-
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertTrue
+@Grab(group = 'junit', module = 'junit', version = '4.11')
 
 @Field Map myParams
-
+@Field String content = ""
+@Field List tabs = new ArrayList()
+@Field File file
 
 myParams = params as Map
 
-@Field String content = ""
-@Field List tabs = new ArrayList()
-
-@Field File file
-if (myParams.containsKey("tool")) {
-    if (myParams.containsKey("go")) {
-        file = "src\\main\\groovy\\${myParams.get("tool")}.groovy" as File
-        content = showPage(file)
-    }
-}
-
-String showPage(File file) {
+String scriptText(File script, String method, Object... prms) {
     def buf = new ByteArrayOutputStream()
     def newOut = new PrintStream(buf)
     def saveOut = System.out
     System.out = newOut
-    new GroovyShell().run(file, myParams.get('args').split(' '))
+    new GroovyShell().parse(script).invokeMethod(method, prms)
     System.out = saveOut
     buf.toString()
+}
+
+if (myParams.containsKey("tool")) {
+    file = "src\\main\\groovy\\${myParams.get("tool")}.groovy" as File
+    if (myParams.containsKey("go")) {
+        content = scriptText(file, 'main', myParams.get('args').split(' '))
+    }
 }
 
 new File("src/main/groovy").listFiles().each {
@@ -45,35 +39,38 @@ new File("src/main/groovy").listFiles().each {
 html.html {    // html is implicitly bound to new MarkupBuilder(out)
     head {
         title("t-is-for-toolbar")
+        style("""
+body
+{
+font-family:"courier";
+font-size:30px;
+}
+   """)
     }
     body {
         p(tabs.each {
             a(href: "toolbar.groovy?tool=$it", it)
         })
         if (myParams.containsKey("tool")) {
-            if (myParams.containsKey("go")) {
-                p(content)
-            } else {
-                html.form {
+            html.form {
 //                    p(helpText())
-//                    p(helpText())
-                    input('type': 'text', 'name': 'args')
-                    input('type': 'hidden', 'name': 'tool', 'value': myParams.get("tool"))
-                    input('type': 'submit', 'name': 'go', 'value': 'go')
-                }
+                p(help())
+                input('type': 'text', 'name': 'args')
+                input('type': 'hidden', 'name': 'tool', 'value': myParams.get("tool"))
+                input('type': 'submit', 'name': 'go', 'value': 'go')
             }
+        }
+        if (myParams.containsKey("go")) {
+            hr{}
+            p(content)
         }
     }
 }
 
-private Object helpText() {
+private String help() {
     try {
-        assertNotNull file
-        assertTrue file.exists()
-        Script script = new GroovyShell().parse(file)
-        script.invokeMethod('help', [])
+        scriptText(file, 'help', null)
     } catch (RuntimeException e) {
-        e.printStackTrace()
-        return 'help not found'
+        'no help found'
     }
 }
