@@ -1,13 +1,14 @@
 import groovy.transform.Field
 
-@Grab(group = 'junit', module = 'junit', version = '4.11')
-
-@Field Map myParams
+@Grab(group = 'junit', module = 'junit', version = '4.11') @Field Map myParams
 @Field String content = ""
 @Field List tabs = new ArrayList()
 @Field File file
+@Field String toolname
 
 myParams = params as Map
+
+toolname = myParams.get('tool')
 
 String scriptText(File script, String method, Object... prms) {
     def buf = new ByteArrayOutputStream()
@@ -20,7 +21,7 @@ String scriptText(File script, String method, Object... prms) {
 }
 
 if (myParams.containsKey("tool")) {
-    file = "src\\main\\groovy\\${myParams.get("tool")}.groovy" as File
+    file = "src\\main\\groovy\\${toolname}.groovy" as File
     if (myParams.containsKey("go")) {
         content = scriptText(file, 'main', myParams.get('args').split(' '))
     }
@@ -35,25 +36,41 @@ new File("src/main/groovy").listFiles().each {
 }
 
 
-
 html.html {    // html is implicitly bound to new MarkupBuilder(out)
     head {
         title("t-is-for-toolbar")
         style("""
-body
+body,input
 {
 font-family:"courier";
-font-size:30px;
+font-size:25px;
+line-height:4px;
+}
+.selected {
+    font-weight:bold;
+}
+h1{
+    color:cyan;
+    line-height:30px;
+    font-weight:bold;
 }
    """)
     }
     body {
-        p(tabs.each {
-            a(href: "toolbar.groovy?tool=$it", it)
-        })
+        h1 't-is-for-toolbar'
+        tabs.each {
+            String tab ->
+                if (toolname == tab) {
+                    span('class': 'selected', {
+                        a(href: "toolbar.groovy?tool=$tab", tab)
+                    })
+
+                } else {
+                    a(href: "toolbar.groovy?tool=$tab", tab)
+                }
+        }
         if (myParams.containsKey("tool")) {
             html.form {
-//                    p(helpText())
                 p(help())
                 input('type': 'text', 'name': 'args')
                 input('type': 'hidden', 'name': 'tool', 'value': myParams.get("tool"))
@@ -61,8 +78,10 @@ font-size:30px;
             }
         }
         if (myParams.containsKey("go")) {
-            hr{}
-            p(content)
+            hr {}
+            content.split('\n').each {
+                p(it)
+            }
         }
     }
 }
