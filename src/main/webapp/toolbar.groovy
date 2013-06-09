@@ -10,16 +10,6 @@ myParams = params as Map
 
 toolname = myParams.get('tool')
 
-String scriptText(File script, String method, Object... prms) {
-    def buf = new ByteArrayOutputStream()
-    def newOut = new PrintStream(buf)
-    def saveOut = System.out
-    System.out = newOut
-    new GroovyShell().parse(script).invokeMethod(method, prms)
-    System.out = saveOut
-    buf.toString()
-}
-
 if (myParams.containsKey("tool")) {
     file = "src\\main\\groovy\\${toolname}.groovy" as File
     if (myParams.containsKey("go")) {
@@ -34,7 +24,6 @@ new File("src/main/groovy").listFiles().each {
         }
         tabs.add(tool.name - '.groovy')
 }
-
 
 html.html {    // html is implicitly bound to new MarkupBuilder(out)
     head {
@@ -86,10 +75,21 @@ h1{
     }
 }
 
+
 private String help() {
     try {
         scriptText(file, 'help', null)
     } catch (RuntimeException e) {
         'no help found'
     }
+}
+
+String scriptText(File script, String method, Object... prms) {
+    def buf = new ByteArrayOutputStream()
+    def newOut = new PrintStream(buf)
+    def saveOut = System.out
+    System.out = newOut
+    new GroovyShell().parse(script).invokeMethod(method, prms)
+    System.out = saveOut
+    buf.toString()
 }
