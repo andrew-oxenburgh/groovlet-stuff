@@ -29,20 +29,23 @@ html.html {    // html is implicitly bound to new MarkupBuilder(out)
     head {
         title("t-is-for-toolbar")
         style("""
-body,input
-{
-font-family:"courier";
-font-size:25px;
-line-height:4px;
+
+body,input{
+    font-family:"courier";
+    font-size:15px;
+    line-height:4px;
 }
+
 .selected {
     font-weight:bold;
 }
+
 h1{
     color:cyan;
-    line-height:30px;
+    line-height:25px;
     font-weight:bold;
 }
+
    """)
     }
     body {
@@ -61,7 +64,7 @@ h1{
         if (myParams.containsKey("tool")) {
             html.form {
                 p(help())
-                input('type': 'text', 'name': 'args')
+                input('type': 'text', 'name': 'args', 'value':myParams.get("args"))
                 input('type': 'hidden', 'name': 'tool', 'value': myParams.get("tool"))
                 input('type': 'submit', 'name': 'go', 'value': 'go')
             }
@@ -74,7 +77,6 @@ h1{
         }
     }
 }
-
 
 private String help() {
     try {
