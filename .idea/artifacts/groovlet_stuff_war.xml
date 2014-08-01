@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="groovlet-stuff:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="groovlet-stuff.war">
-      <element id="artifact" artifact-name="groovlet-stuff:war exploded" />
-    </root>
-  </artifact>
-</component>
