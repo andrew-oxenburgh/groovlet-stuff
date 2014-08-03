@@ -14,5 +14,28 @@
         <servlet-name>Groovy</servlet-name>
         <url-pattern>*.groovy</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>Template</servlet-name>
+        <servlet-class>groovy.servlet.TemplateServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Template</servlet-name>
+        <url-pattern>demo.html</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Template</servlet-name>
+        <url-pattern>*.gsp</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>helloWorld</filter-name>
+        <filter-class>org.MarkDownFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>helloWorld</filter-name>
+        <url-pattern>*.groovy</url-pattern>
+    </filter-mapping>
+
 
 </web-app>
